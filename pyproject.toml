@@ -1,7 +1,10 @@
 [project]
 name = "flaskstar"
 version = "0.1.0"
-description = "Add your description here"
+description = "Flask front end for RAGstar project"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "flask>=3.1.2",
+    "requests>=2.32.5",
+]

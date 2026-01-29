@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}RAGstar | Portfolio{% endblock %}
+
+{% block body_class %}ragstar-page{% endblock %}
+
+{% block content %}
+  <section id="ragstar" class="ragstar section">
+    <div class="container section-title" data-aos="fade-up">
+      <h2>RAGstar</h2>
+      <p>A compact RAG system for discovering the right GitHub repositories with natural language queries.</p>
+    </div>
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row g-4 align-items-stretch">
+        <div class="col-lg-6">
+          <div class="ragstar-panel h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <h3 class="mb-1">Prompt workspace</h3>
+                <p class="text-muted mb-0">Ask a question to find the right repository.</p>
+              </div>
+              <span class="badge ragstar-pill">LLM ready</span>
+            </div>
+
+            <div class="ragstar-chat">
+              <div class="ragstar-message bot">
+                <div class="ragstar-avatar">R</div>
+                <div>
+                  <p class="mb-1">Hi! I can search your repository knowledge base once the LLM is connected.</p>
+                  <small class="text-muted">Tip: Try “vector search + Python API”.</small>
+                </div>
+              </div>
+              <div class="ragstar-message user">
+                <div class="ragstar-avatar user">You</div>
+                <div>
+                  <p class="mb-1">Which repos cover hybrid retrieval with BM25 + embeddings?</p>
+                  <small class="text-muted">Queued — LLM integration coming soon</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="ragstar-input mt-3">
+              <textarea class="form-control" rows="4" placeholder="Ask anything about a GitHub repository..." disabled></textarea>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <small class="text-muted">Connected sources: GitHub README.md only</small>
+                <button class="btn btn-primary" disabled>Send prompt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="ragstar-panel h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <h3 class="mb-1">Project overview</h3>
+                <p class="text-muted mb-0">From the RAGstar reference implementation.</p>
+              </div>
+              <a class="ragstar-link" href="https://github.com/Stefgug/RAGstar" target="_blank" rel="noreferrer">
+                View repository <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+            </div>
+
+            <div class="ragstar-overview">
+              <p>
+                RAGstar is a small app that helps you find the right GitHub repository by asking a natural language question.
+                It fetches repository content, generates short summaries with Ollama, stores them in ChromaDB, and lets you
+                search using a hybrid score that blends dense embeddings with BM25.
+              </p>
+
+              <div class="ragstar-list">
+                <h4>Core flow</h4>
+                <ul>
+                  <li>Fetches README.md content with gitingest.</li>
+                  <li>Summarizes repositories using a local Ollama model.</li>
+                  <li>Indexes summaries in ChromaDB with sentence-transformer embeddings.</li>
+                  <li>Answers queries with hybrid dense + BM25 scoring.</li>
+                </ul>
+              </div>
+
+              <div class="ragstar-list mt-3">
+                <h4>Tech stack</h4>
+                <div class="ragstar-tags">
+                  <span>FastAPI</span>
+                  <span>ChromaDB</span>
+                  <span>Sentence Transformers</span>
+                  <span>Ollama</span>
+                  <span>gitingest</span>
+                  <span>Docker</span>
+                </div>
+              </div>
+
+              <div class="ragstar-metrics mt-4">
+                <h4>Live signals (preview)</h4>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="metric-card">
+                      <span class="metric-label">Tokens used</span>
+                      <span class="metric-value">—</span>
+                      <span class="metric-note">Waiting for LLM runtime</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="metric-card">
+                      <span class="metric-label">Cost estimate</span>
+                      <span class="metric-value">—</span>
+                      <span class="metric-note">Connect billing provider</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="metric-card">
+                      <span class="metric-label">Query latency</span>
+                      <span class="metric-value">—</span>
+                      <span class="metric-note">Awaiting telemetry</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="metric-card">
+                      <span class="metric-label">Index status</span>
+                      <span class="metric-value">Ready</span>
+                      <span class="metric-note">ChromaDB online</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

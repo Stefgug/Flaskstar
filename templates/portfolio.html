@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio - FolioOne Bootstrap Template{% endblock %}
+
+{% block body_class %}portfolio-page{% endblock %}
+
+{% block content %}
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Portfolio</h2>
+        <p>Welcome to my portfolio where I showcase demo applications that highlight my data science, data engineering, and AI skills.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+          <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="200">
+            <li data-filter="*" class="filter-active">All</li>
+            <li data-filter=".filter-llm">LLM</li>
+            <li data-filter=".filter-rag">RAG</li>
+          </ul><!-- End Portfolio Filters -->
+
+          <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-llm filter-rag">
+              <a href="/portfolio/RAGstar" class="portfolio-card d-block">
+                <div class="portfolio-info d-flex align-items-start gap-3">
+                  <img src="{{ url_for('static', filename='assets/img/search icon.png') }}" alt="RAGstar" class="portfolio-icon">
+                  <div class="portfolio-text">
+                    <h4>RAGstar</h4>
+                    <p>RAG from favorite</p>
+                    <div class="portfolio-tags">
+                      <span>LLM</span>
+                      <span>RAG</span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div><!-- End Portfolio Items Container -->
+
+        </div>
+
+        <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="400">
+          <a href="#portfolio" class="btn btn-primary">View All Case Studies</a>
+        </div>
+
+      </div>
+
+    </section><!-- /Portfolio Section -->
+
+{% endblock %}
