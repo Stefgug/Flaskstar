@@ -15,37 +15,91 @@
       <div class="row g-4 align-items-stretch">
         <div class="col-lg-6">
           <div class="ragstar-panel h-100">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <div>
-                <h3 class="mb-1">Prompt workspace</h3>
-                <p class="text-muted mb-0">Ask a question to find the right repository.</p>
-              </div>
-              <span class="badge ragstar-pill">LLM ready</span>
+            <div class="mb-3">
+              <h3 class="mb-1">Prompt workspace</h3>
+              <p class="text-muted mb-0">Ask a question to find the right repository.</p>
             </div>
 
-            <div class="ragstar-chat">
-              <div class="ragstar-message bot">
-                <div class="ragstar-avatar">R</div>
-                <div>
-                  <p class="mb-1">Hi! I can search your repository knowledge base once the LLM is connected.</p>
-                  <small class="text-muted">Tip: Try “vector search + Python API”.</small>
-                </div>
-              </div>
-              <div class="ragstar-message user">
-                <div class="ragstar-avatar user">You</div>
-                <div>
-                  <p class="mb-1">Which repos cover hybrid retrieval with BM25 + embeddings?</p>
-                  <small class="text-muted">Queued — LLM integration coming soon</small>
-                </div>
-              </div>
-            </div>
-
-            <div class="ragstar-input mt-3">
-              <textarea class="form-control" rows="4" placeholder="Ask anything about a GitHub repository..." disabled></textarea>
+            <form class="ragstar-input" id="ragstar-form">
+              <textarea class="form-control" id="ragstar-query" rows="4" placeholder="Ask anything about a GitHub repository..." required></textarea>
               <div class="d-flex justify-content-between align-items-center mt-2">
-                <small class="text-muted">Connected sources: GitHub README.md only</small>
-                <button class="btn btn-primary" disabled>Send prompt</button>
+                <button class="btn btn-primary" type="submit" id="ragstar-submit">Send prompt</button>
               </div>
+              <div class="ragstar-status" id="ragstar-status" aria-live="polite"></div>
+            </form>
+
+            <div class="ragstar-results mt-12" id="ragstar-results">
+              <div class="ragstar-results-header">
+                <h4 class="mb-0">Results</h4>
+                <span class="badge ragstar-pill" id="ragstar-count">0</span>
+              </div>
+              <div class="ragstar-results-body" id="ragstar-results-body">
+                <p class="text-muted mb-0">Run a query to see matching repositories.</p>
+              </div>
+            </div>
+
+            <div class="ragstar-import mt-5 pt-3">
+              <div class="ragstar-results-header">
+                <h4 class="mb-0">Import starred repos</h4>
+                <span class="badge ragstar-pill">Optional</span>
+              </div>
+              <p class="text-muted">
+                Enter a public GitHub username to import starred repositories into the RAGstar database.
+              </p>
+              <form class="mt-3" id="ragstar-starred-form">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent text-muted">@</span>
+                  <input class="form-control" id="ragstar-username" placeholder="GitHub username" required />
+                  <button class="btn btn-primary" type="submit" id="ragstar-starred-submit">Add starred repos</button>
+                </div>
+                <div class="ragstar-progress mt-3" id="ragstar-progress" style="display: none;">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted" id="ragstar-progress-label">Importing repositories...</small>
+                    <small class="text-muted" id="ragstar-progress-count">0 / 0</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="ragstar-progress-bar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-1">
+                    <small class="text-success" id="ragstar-stored-count">Stored: 0</small>
+                    <small class="text-warning" id="ragstar-skipped-count">Skipped: 0</small>
+                    <small class="text-danger" id="ragstar-errored-count">Errors: 0</small>
+                  </div>
+                </div>
+                <div class="ragstar-status" id="ragstar-starred-status" aria-live="polite"></div>
+              </form>
+            </div>
+
+            <div class="ragstar-import mt-5 pt-3">
+              <div class="ragstar-results-header">
+                <h4 class="mb-0">Add repository</h4>
+                <span class="badge ragstar-pill">Direct</span>
+              </div>
+              <p class="text-muted">
+                Enter a GitHub repository URL to add it directly to the RAGstar database.
+              </p>
+              <form class="mt-3" id="ragstar-repo-form">
+                <div class="input-group">
+                  <span class="input-group-text bg-transparent text-muted"><i class="bi bi-github"></i></span>
+                  <input class="form-control" id="ragstar-repo-url" placeholder="https://github.com/owner/repo" required />
+                  <button class="btn btn-primary" type="submit" id="ragstar-repo-submit">Add repo</button>
+                </div>
+                <div class="ragstar-progress mt-3" id="ragstar-repo-progress" style="display: none;">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted" id="ragstar-repo-progress-label">Adding repository...</small>
+                    <small class="text-muted" id="ragstar-repo-progress-count">0 / 1</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="ragstar-repo-progress-bar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-1">
+                    <small class="text-success" id="ragstar-repo-stored-count">Stored: 0</small>
+                    <small class="text-warning" id="ragstar-repo-skipped-count">Skipped: 0</small>
+                    <small class="text-danger" id="ragstar-repo-errored-count">Errors: 0</small>
+                  </div>
+                </div>
+                <div class="ragstar-status" id="ragstar-repo-status" aria-live="polite"></div>
+              </form>
             </div>
           </div>
         </div>
@@ -97,22 +151,22 @@
                   <div class="col-md-6">
                     <div class="metric-card">
                       <span class="metric-label">Tokens used</span>
-                      <span class="metric-value">—</span>
-                      <span class="metric-note">Waiting for LLM runtime</span>
+                      <span class="metric-value" id="metric-tokens">—</span>
+                      <span class="metric-note" id="metric-tokens-note">Waiting for LLM runtime</span>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="metric-card">
                       <span class="metric-label">Cost estimate</span>
-                      <span class="metric-value">—</span>
-                      <span class="metric-note">Connect billing provider</span>
+                      <span class="metric-value" id="metric-cost">—</span>
+                      <span class="metric-note" id="metric-cost-note">Connect billing provider</span>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="metric-card">
                       <span class="metric-label">Query latency</span>
-                      <span class="metric-value">—</span>
-                      <span class="metric-note">Awaiting telemetry</span>
+                      <span class="metric-value" id="metric-latency">—</span>
+                      <span class="metric-note" id="metric-latency-note">Awaiting telemetry</span>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -130,4 +184,350 @@
       </div>
     </div>
   </section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+    (() => {
+      const form = document.getElementById("ragstar-form");
+      const queryInput = document.getElementById("ragstar-query");
+      const submitBtn = document.getElementById("ragstar-submit");
+      const statusEl = document.getElementById("ragstar-status");
+      const countEl = document.getElementById("ragstar-count");
+      const resultsBody = document.getElementById("ragstar-results-body");
+      const latencyEl = document.getElementById("metric-latency");
+      const latencyNote = document.getElementById("metric-latency-note");
+      const tokensEl = document.getElementById("metric-tokens");
+      const tokensNote = document.getElementById("metric-tokens-note");
+      const starredForm = document.getElementById("ragstar-starred-form");
+      const starredUsername = document.getElementById("ragstar-username");
+      const starredStatus = document.getElementById("ragstar-starred-status");
+
+      if (!form) return;
+
+      const setStatus = (message, type = "") => {
+        statusEl.textContent = message;
+        statusEl.dataset.state = type;
+      };
+
+      const renderResults = (results = []) => {
+        countEl.textContent = String(results.length);
+
+        if (!results.length) {
+          resultsBody.innerHTML = '<p class="text-muted mb-0">No repositories matched your query.</p>';
+          return;
+        }
+
+        resultsBody.innerHTML = results.map((item) => {
+          const repo = item.repo_name || "Unknown repo";
+          const url = item.repo_url || "#";
+          const summary = item.summary || "No summary available.";
+          const score = typeof item.hybrid_score === "number" ? item.hybrid_score : "—";
+
+          return `
+            <div class="ragstar-result-card">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h5 class="mb-1">${repo}</h5>
+                  <a href="${url}" target="_blank" rel="noreferrer">${url}</a>
+                </div>
+                <span class="ragstar-score">${score}</span>
+              </div>
+              <p class="mb-0">${summary}</p>
+            </div>
+          `;
+        }).join("");
+      };
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const query = queryInput.value.trim();
+        if (!query) {
+          setStatus("Please enter a query.", "error");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        setStatus("Querying RAGstar...", "loading");
+        const start = performance.now();
+
+        try {
+          const response = await fetch("/ragstar/query", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query, num_results: 5 })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "RAGstar query failed.");
+          }
+
+          renderResults(data.results || []);
+          setStatus("Results updated.", "success");
+
+          const elapsed = Math.round(performance.now() - start);
+          latencyEl.textContent = `${elapsed} ms`;
+          latencyNote.textContent = "Round-trip time";
+
+          tokensEl.textContent = "—";
+          tokensNote.textContent = "Token usage not available";
+        } catch (error) {
+          renderResults([]);
+          setStatus(error.message || "Something went wrong.", "error");
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      if (starredForm) {
+        const starredSubmitBtn = document.getElementById("ragstar-starred-submit");
+        const progressContainer = document.getElementById("ragstar-progress");
+        const progressBar = document.getElementById("ragstar-progress-bar");
+        const progressLabel = document.getElementById("ragstar-progress-label");
+        const progressCount = document.getElementById("ragstar-progress-count");
+        const storedCount = document.getElementById("ragstar-stored-count");
+        const skippedCount = document.getElementById("ragstar-skipped-count");
+        const erroredCount = document.getElementById("ragstar-errored-count");
+
+        const updateProgress = (index, total, stored, skipped, errored) => {
+          const percent = total > 0 ? Math.round((index / total) * 100) : 0;
+          progressBar.style.width = `${percent}%`;
+          progressBar.setAttribute("aria-valuenow", percent);
+          progressCount.textContent = `${index} / ${total}`;
+          storedCount.textContent = `Stored: ${stored}`;
+          skippedCount.textContent = `Skipped: ${skipped}`;
+          erroredCount.textContent = `Errors: ${errored}`;
+        };
+
+        const resetProgress = () => {
+          progressBar.style.width = "0%";
+          progressBar.setAttribute("aria-valuenow", 0);
+          progressCount.textContent = "0 / 0";
+          storedCount.textContent = "Stored: 0";
+          skippedCount.textContent = "Skipped: 0";
+          erroredCount.textContent = "Errors: 0";
+          progressBar.classList.remove("bg-success", "bg-danger");
+          progressBar.classList.add("progress-bar-striped", "progress-bar-animated");
+        };
+
+        starredForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const username = starredUsername.value.trim();
+          if (!username) {
+            starredStatus.textContent = "Please enter a GitHub username.";
+            starredStatus.dataset.state = "error";
+            return;
+          }
+
+          starredSubmitBtn.disabled = true;
+          resetProgress();
+          progressContainer.style.display = "block";
+          starredStatus.textContent = "Fetching starred repositories...";
+          starredStatus.dataset.state = "loading";
+
+          try {
+            // First, fetch the user's starred repositories from GitHub API
+            const starsResponse = await fetch(`https://api.github.com/users/${username}/starred?per_page=100`);
+            if (!starsResponse.ok) {
+              throw new Error(`Could not fetch starred repos for ${username}`);
+            }
+            const starredRepos = await starsResponse.json();
+            const repoUrls = starredRepos.map(repo => repo.html_url);
+
+            if (repoUrls.length === 0) {
+              throw new Error(`No starred repositories found for ${username}`);
+            }
+
+            progressLabel.textContent = `Importing ${repoUrls.length} repositories...`;
+            starredStatus.textContent = "Streaming import progress...";
+
+            // Use fetch with ReadableStream for SSE via Flask proxy
+            const response = await fetch("/ragstar/build-stream", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ repositories: repoUrls })
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to start import stream.");
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let finalStats = { stored: 0, skipped: 0, errored: 0, total: 0 };
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop(); // Keep incomplete line in buffer
+
+              for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                  try {
+                    const data = JSON.parse(line.slice(6));
+                    if (data.event === "start") {
+                      finalStats.total = data.total;
+                      updateProgress(0, data.total, 0, 0, 0);
+                    } else if (data.event === "progress") {
+                      finalStats = { stored: data.stored, skipped: data.skipped, errored: data.errored, total: data.total };
+                      updateProgress(data.index, data.total, data.stored, data.skipped, data.errored);
+                    } else if (data.event === "complete") {
+                      finalStats = { stored: data.stored, skipped: data.skipped, errored: data.errored, total: data.total };
+                    }
+                  } catch (e) {
+                    console.warn("Failed to parse SSE data:", line);
+                  }
+                }
+              }
+            }
+
+            progressBar.classList.remove("progress-bar-striped", "progress-bar-animated");
+            progressBar.classList.add(finalStats.errored > 0 ? "bg-warning" : "bg-success");
+            starredStatus.textContent = `Import complete: ${finalStats.stored} stored, ${finalStats.skipped} skipped, ${finalStats.errored} errors.`;
+            starredStatus.dataset.state = finalStats.errored > 0 ? "warning" : "success";
+          } catch (error) {
+            progressBar.classList.remove("progress-bar-striped", "progress-bar-animated");
+            progressBar.classList.add("bg-danger");
+            starredStatus.textContent = error.message || "Import failed.";
+            starredStatus.dataset.state = "error";
+          } finally {
+            starredSubmitBtn.disabled = false;
+          }
+        });
+      }
+
+      // Single repository form handler
+      const repoForm = document.getElementById("ragstar-repo-form");
+      if (repoForm) {
+        const repoUrlInput = document.getElementById("ragstar-repo-url");
+        const repoSubmitBtn = document.getElementById("ragstar-repo-submit");
+        const repoStatus = document.getElementById("ragstar-repo-status");
+        const repoProgressContainer = document.getElementById("ragstar-repo-progress");
+        const repoProgressBar = document.getElementById("ragstar-repo-progress-bar");
+        const repoProgressLabel = document.getElementById("ragstar-repo-progress-label");
+        const repoProgressCount = document.getElementById("ragstar-repo-progress-count");
+        const repoStoredCount = document.getElementById("ragstar-repo-stored-count");
+        const repoSkippedCount = document.getElementById("ragstar-repo-skipped-count");
+        const repoErroredCount = document.getElementById("ragstar-repo-errored-count");
+
+        const updateRepoProgress = (index, total, stored, skipped, errored) => {
+          const percent = total > 0 ? Math.round((index / total) * 100) : 0;
+          repoProgressBar.style.width = `${percent}%`;
+          repoProgressBar.setAttribute("aria-valuenow", percent);
+          repoProgressCount.textContent = `${index} / ${total}`;
+          repoStoredCount.textContent = `Stored: ${stored}`;
+          repoSkippedCount.textContent = `Skipped: ${skipped}`;
+          repoErroredCount.textContent = `Errors: ${errored}`;
+        };
+
+        const resetRepoProgress = () => {
+          repoProgressBar.style.width = "0%";
+          repoProgressBar.setAttribute("aria-valuenow", 0);
+          repoProgressCount.textContent = "0 / 1";
+          repoStoredCount.textContent = "Stored: 0";
+          repoSkippedCount.textContent = "Skipped: 0";
+          repoErroredCount.textContent = "Errors: 0";
+          repoProgressBar.classList.remove("bg-success", "bg-danger", "bg-warning");
+          repoProgressBar.classList.add("progress-bar-striped", "progress-bar-animated");
+        };
+
+        repoForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const repoUrl = repoUrlInput.value.trim();
+          if (!repoUrl) {
+            repoStatus.textContent = "Please enter a repository URL.";
+            repoStatus.dataset.state = "error";
+            return;
+          }
+
+          // Basic GitHub URL validation
+          if (!repoUrl.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/i)) {
+            repoStatus.textContent = "Please enter a valid GitHub repository URL (e.g., https://github.com/owner/repo).";
+            repoStatus.dataset.state = "error";
+            return;
+          }
+
+          repoSubmitBtn.disabled = true;
+          resetRepoProgress();
+          repoProgressContainer.style.display = "block";
+          repoProgressLabel.textContent = "Adding repository...";
+          repoStatus.textContent = "Streaming import progress...";
+          repoStatus.dataset.state = "loading";
+
+          try {
+            const response = await fetch("/ragstar/build-stream", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ repositories: [repoUrl] })
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to start import stream.");
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let finalStats = { stored: 0, skipped: 0, errored: 0, total: 1 };
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop();
+
+              for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                  try {
+                    const data = JSON.parse(line.slice(6));
+                    if (data.event === "start") {
+                      finalStats.total = data.total;
+                      updateRepoProgress(0, data.total, 0, 0, 0);
+                    } else if (data.event === "progress") {
+                      finalStats = { stored: data.stored, skipped: data.skipped, errored: data.errored, total: data.total };
+                      updateRepoProgress(data.index, data.total, data.stored, data.skipped, data.errored);
+                    } else if (data.event === "complete") {
+                      finalStats = { stored: data.stored, skipped: data.skipped, errored: data.errored, total: data.total };
+                    }
+                  } catch (e) {
+                    console.warn("Failed to parse SSE data:", line);
+                  }
+                }
+              }
+            }
+
+            repoProgressBar.classList.remove("progress-bar-striped", "progress-bar-animated");
+            if (finalStats.errored > 0) {
+              repoProgressBar.classList.add("bg-danger");
+              repoStatus.textContent = "Failed to add repository.";
+              repoStatus.dataset.state = "error";
+            } else if (finalStats.skipped > 0) {
+              repoProgressBar.classList.add("bg-warning");
+              repoStatus.textContent = "Repository already exists in database.";
+              repoStatus.dataset.state = "warning";
+            } else {
+              repoProgressBar.classList.add("bg-success");
+              repoStatus.textContent = "Repository added successfully!";
+              repoStatus.dataset.state = "success";
+              repoUrlInput.value = "";
+            }
+          } catch (error) {
+            repoProgressBar.classList.remove("progress-bar-striped", "progress-bar-animated");
+            repoProgressBar.classList.add("bg-danger");
+            repoStatus.textContent = error.message || "Import failed.";
+            repoStatus.dataset.state = "error";
+          } finally {
+            repoSubmitBtn.disabled = false;
+          }
+        });
+      }
+    })();
+  </script>
 {% endblock %}

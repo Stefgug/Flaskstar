@@ -2893,7 +2893,7 @@ section,
 }
 
 .ragstar-page .ragstar-panel .text-muted {
-  color: color-mix(in srgb, var(--default-color), transparent 40%);
+  color: var(--default-color) !important;
 }
 
 .ragstar-page .ragstar-pill {
@@ -2919,6 +2919,15 @@ section,
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
+}
+
+.ragstar-page .ragstar-message p,
+.ragstar-page .ragstar-message small,
+.ragstar-page .ragstar-chat .text-muted,
+.ragstar-page .ragstar-results-body p,
+.ragstar-page .ragstar-import .text-muted,
+.ragstar-page .ragstar-input .text-muted {
+  color: var(--default-color) !important;
 }
 
 .ragstar-page .ragstar-message.user {
@@ -2983,6 +2992,79 @@ section,
   border-radius: 999px;
   font-size: 0.85rem;
   letter-spacing: 0.02em;
+}
+
+.ragstar-page .ragstar-status {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+}
+
+.ragstar-page .ragstar-status[data-state="error"] {
+  color: #ff8b8b;
+}
+
+.ragstar-page .ragstar-status[data-state="success"] {
+  color: #8be6a2;
+}
+
+.ragstar-page .ragstar-results {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  background: color-mix(in srgb, var(--background-color), transparent 6%);
+}
+
+.ragstar-page .ragstar-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ragstar-page .ragstar-results-body {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ragstar-page .ragstar-result-card {
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  background: color-mix(in srgb, var(--surface-color), transparent 20%);
+}
+
+.ragstar-page .ragstar-result-card h5 {
+  font-size: 1rem;
+}
+
+.ragstar-page .ragstar-result-card a {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--accent-color), transparent 10%);
+}
+
+.ragstar-page .ragstar-score {
+  background: color-mix(in srgb, var(--accent-color), transparent 15%);
+  color: var(--contrast-color);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ragstar-page .ragstar-import .input-group-text {
+  border-color: color-mix(in srgb, var(--default-color), transparent 85%);
+}
+
+.ragstar-page .ragstar-import .form-control {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--default-color), transparent 85%);
+  color: var(--default-color);
+}
+
+.ragstar-page .ragstar-import .form-control::placeholder {
+  color: color-mix(in srgb, var(--default-color), transparent 55%);
 }
 
 .ragstar-page .metric-card {
