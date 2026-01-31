@@ -5,7 +5,7 @@ import requests
 
 app = Flask(__name__)
 
-RAGSTAR_API_URL = os.getenv("RAGSTAR_API_URL", "http://localhost:8001")
+RAGSTAR_API_URL = os.getenv("RAGSTAR_API_URL", "http://34.155.88.253/")
 
 @app.route("/")
 def home():
@@ -102,13 +102,16 @@ def ragstar_build_stream():
                 f"{RAGSTAR_API_URL}/build/stream",
                 json={"repositories": repositories},
                 stream=True,
-                timeout=300,
+                timeout=600,
             ) as response:
                 response.raise_for_status()
                 for line in response.iter_lines():
                     if line:
                         yield line.decode("utf-8") + "\n"
+            # Add this to see if stream completed normally
+            app.logger.info("SSE stream completed normally")
         except requests.RequestException as exc:
+            app.logger.error(f"SSE stream error: {exc}")
             yield f"data: {{\"event\": \"error\", \"message\": \"{str(exc)}\"}}\n\n"
 
     return Response(
