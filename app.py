@@ -25,17 +25,17 @@ def ragstar():
 @app.post("/ragstar/query")
 def ragstar_query():
     payload = request.get_json(silent=True) or {}
-    query = str(payload.get("query", "")).strip()
+    question = str(payload.get("question", "")).strip()
     num_results = payload.get("num_results", 5)
 
-    if not query:
-        return jsonify({"error": "Query is required."}), 400
+    if not question:
+        return jsonify({"error": "Question is required."}), 400
 
     try:
         response = requests.post(
-            f"{RAGSTAR_API_URL}/query",
-            json={"query": query, "num_results": num_results},
-            timeout=20,
+            f"{RAGSTAR_API_URL}/ask",
+            json={"question": question, "num_results": num_results},
+            timeout=30,
         )
         response.raise_for_status()
         return jsonify(response.json())

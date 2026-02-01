@@ -76,3 +76,6 @@ dist/
 build/
 
 .playwright-mcp/
+
+.env
+.envrc

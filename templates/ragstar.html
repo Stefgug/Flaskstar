@@ -109,7 +109,6 @@
             <div class="d-flex align-items-center justify-content-between mb-3">
               <div>
                 <h3 class="mb-1">Project overview</h3>
-                <p class="text-muted mb-0">From the RAGstar reference implementation.</p>
               </div>
               <a class="ragstar-link" href="https://github.com/Stefgug/RAGstar" target="_blank" rel="noreferrer">
                 View repository <i class="bi bi-box-arrow-up-right"></i>
@@ -117,18 +116,11 @@
             </div>
 
             <div class="ragstar-overview">
-              <p>
-                RAGstar is a small app that helps you find the right GitHub repository by asking a natural language question.
-                It fetches repository content, generates short summaries with Ollama, stores them in ChromaDB, and lets you
-                search using a hybrid score that blends dense embeddings with BM25.
-              </p>
-
               <div class="ragstar-list">
-                <h4>Core flow</h4>
                 <ul>
-                  <li>Fetches README.md content with gitingest.</li>
-                  <li>Summarizes repositories using a local Ollama model.</li>
-                  <li>Indexes summaries in ChromaDB with sentence-transformer embeddings.</li>
+                  <li>Fetches README.md content with github API</li>
+                  <li>Summarizes repositories using Mistral Ollama model hosted locally.</li>
+                  <li>Indexes summaries in ChromaDB with mxbai-embed-large embeddings.</li>
                   <li>Answers queries with hybrid dense + BM25 scoring.</li>
                 </ul>
               </div>
@@ -138,10 +130,9 @@
                 <div class="ragstar-tags">
                   <span>FastAPI</span>
                   <span>ChromaDB</span>
-                  <span>Sentence Transformers</span>
+                  <span>Mistral</span>
                   <span>Ollama</span>
-                  <span>gitingest</span>
-                  <span>Docker</span>
+                  <span>Google Kubernetes Engine</span>
                 </div>
               </div>
 
@@ -150,16 +141,30 @@
                 <div class="row g-3">
                   <div class="col-md-6">
                     <div class="metric-card">
-                      <span class="metric-label">Tokens used</span>
-                      <span class="metric-value" id="metric-tokens">—</span>
-                      <span class="metric-note" id="metric-tokens-note">Waiting for LLM runtime</span>
+                      <span class="metric-label">Prompt tokens</span>
+                      <span class="metric-value" id="metric-prompt-tokens">—</span>
+                      <span class="metric-note" id="metric-prompt-tokens-note">Waiting for query</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="metric-card">
+                      <span class="metric-label">Completion tokens</span>
+                      <span class="metric-value" id="metric-completion-tokens">—</span>
+                      <span class="metric-note" id="metric-completion-tokens-note">Waiting for query</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="metric-card">
+                      <span class="metric-label">Total tokens</span>
+                      <span class="metric-value" id="metric-total-tokens">—</span>
+                      <span class="metric-note" id="metric-total-tokens-note">Waiting for query</span>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="metric-card">
                       <span class="metric-label">Cost estimate</span>
                       <span class="metric-value" id="metric-cost">—</span>
-                      <span class="metric-note" id="metric-cost-note">Connect billing provider</span>
+                      <span class="metric-note" id="metric-cost-note">Pricing if it was OpenAI API <br>(It's self hosted)</span>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -167,13 +172,6 @@
                       <span class="metric-label">Query latency</span>
                       <span class="metric-value" id="metric-latency">—</span>
                       <span class="metric-note" id="metric-latency-note">Awaiting telemetry</span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="metric-card">
-                      <span class="metric-label">Index status</span>
-                      <span class="metric-value">Ready</span>
-                      <span class="metric-note">ChromaDB online</span>
                     </div>
                   </div>
                 </div>
@@ -197,8 +195,14 @@
       const resultsBody = document.getElementById("ragstar-results-body");
       const latencyEl = document.getElementById("metric-latency");
       const latencyNote = document.getElementById("metric-latency-note");
-      const tokensEl = document.getElementById("metric-tokens");
-      const tokensNote = document.getElementById("metric-tokens-note");
+      const promptTokensEl = document.getElementById("metric-prompt-tokens");
+      const promptTokensNote = document.getElementById("metric-prompt-tokens-note");
+      const completionTokensEl = document.getElementById("metric-completion-tokens");
+      const completionTokensNote = document.getElementById("metric-completion-tokens-note");
+      const totalTokensEl = document.getElementById("metric-total-tokens");
+      const totalTokensNote = document.getElementById("metric-total-tokens-note");
+      const costEl = document.getElementById("metric-cost");
+      const costNote = document.getElementById("metric-cost-note");
       const starredForm = document.getElementById("ragstar-starred-form");
       const starredUsername = document.getElementById("ragstar-username");
       const starredStatus = document.getElementById("ragstar-starred-status");
@@ -206,44 +210,62 @@
       if (!form) return;
 
       const setStatus = (message, type = "") => {
-        statusEl.textContent = message;
+        if (type === "loading") {
+          statusEl.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${message}`;
+        } else {
+          statusEl.textContent = message;
+        }
         statusEl.dataset.state = type;
       };
 
-      const renderResults = (results = []) => {
-        countEl.textContent = String(results.length);
+      const renderResults = (answer = "", sources = []) => {
+        countEl.textContent = String(sources.length);
 
-        if (!results.length) {
-          resultsBody.innerHTML = '<p class="text-muted mb-0">No repositories matched your query.</p>';
-          return;
-        }
+        let html = "";
 
-        resultsBody.innerHTML = results.map((item) => {
-          const repo = item.repo_name || "Unknown repo";
-          const url = item.repo_url || "#";
-          const summary = item.summary || "No summary available.";
-          const score = typeof item.hybrid_score === "number" ? item.hybrid_score : "—";
-
-          return `
-            <div class="ragstar-result-card">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <h5 class="mb-1">${repo}</h5>
-                  <a href="${url}" target="_blank" rel="noreferrer">${url}</a>
-                </div>
-                <span class="ragstar-score">${score}</span>
-              </div>
-              <p class="mb-0">${summary}</p>
+        // Display the LLM answer first
+        if (answer) {
+          html += `
+            <div class="ragstar-answer-card">
+              <h5 class="mb-2">Answer</h5>
+              <p class="mb-0">${answer}</p>
             </div>
           `;
-        }).join("");
+        }
+
+        // Then display the source repositories
+        if (!sources.length) {
+          html += '<p class="text-muted mb-0">No repositories matched your query.</p>';
+        } else {
+          html += sources.map((item) => {
+            const repo = item.repo_name || "Unknown repo";
+            const url = item.repo_url || "#";
+            const summary = item.summary || "No summary available.";
+            const score = typeof item.hybrid_score === "number" ? item.hybrid_score : "—";
+
+            return `
+              <div class="ragstar-result-card">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h5 class="mb-1">${repo}</h5>
+                    <a href="${url}" target="_blank" rel="noreferrer">${url}</a>
+                  </div>
+                  <span class="ragstar-score">${score}</span>
+                </div>
+                <p class="mb-0">${summary}</p>
+              </div>
+            `;
+          }).join("");
+        }
+
+        resultsBody.innerHTML = html;
       };
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const query = queryInput.value.trim();
-        if (!query) {
-          setStatus("Please enter a query.", "error");
+        const question = queryInput.value.trim();
+        if (!question) {
+          setStatus("Please enter a question.", "error");
           return;
         }
 
@@ -255,7 +277,7 @@
           const response = await fetch("/ragstar/query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query, num_results: 5 })
+            body: JSON.stringify({ question, num_results: 5 })
           });
 
           const data = await response.json();
@@ -263,17 +285,44 @@
             throw new Error(data.error || "RAGstar query failed.");
           }
 
-          renderResults(data.results || []);
+          renderResults(data.answer || "", data.sources || []);
           setStatus("Results updated.", "success");
 
+          // Update token metrics
+          if (data.tokens) {
+            promptTokensEl.textContent = data.tokens.prompt_tokens || "—";
+            promptTokensNote.textContent = "Input tokens";
+
+            completionTokensEl.textContent = data.tokens.completion_tokens || "—";
+            completionTokensNote.textContent = "Output tokens";
+
+            totalTokensEl.textContent = data.tokens.total_tokens || "—";
+            totalTokensNote.textContent = "Combined usage";
+
+            // Calculate cost based on OpenAI GPT-3.5-turbo pricing (~$0.002 per 1K tokens)
+            if (data.tokens.total_tokens) {
+              const costPerToken = 0.000002; // $0.002 per 1K tokens
+              const estimatedCost = (data.tokens.total_tokens * costPerToken).toFixed(6);
+              costEl.textContent = `$${estimatedCost}`;
+              costNote.textContent = "If it was using OpenAI pricing</br>(It's self hosted)";
+            }
+          } else {
+            promptTokensEl.textContent = "—";
+            promptTokensNote.textContent = "Token data unavailable";
+            completionTokensEl.textContent = "—";
+            completionTokensNote.textContent = "Token data unavailable";
+            totalTokensEl.textContent = "—";
+            totalTokensNote.textContent = "Token data unavailable";
+            costEl.textContent = "—";
+            costNote.textContent = "Token data unavailable";
+          }
           const elapsed = Math.round(performance.now() - start);
           latencyEl.textContent = `${elapsed} ms`;
           latencyNote.textContent = "Round-trip time";
 
-          tokensEl.textContent = "—";
-          tokensNote.textContent = "Token usage not available";
+          setStatus("Results updated.", "success");
         } catch (error) {
-          renderResults([]);
+          renderResults("", []);
           setStatus(error.message || "Something went wrong.", "error");
         } finally {
           submitBtn.disabled = false;

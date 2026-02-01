@@ -3028,20 +3028,68 @@ section,
   gap: 0.75rem;
 }
 
+.ragstar-page .ragstar-answer-card {
+  padding: 1rem 1.15rem;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+  background: color-mix(in srgb, var(--accent-color), transparent 92%);
+  margin-bottom: 0.5rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.ragstar-page .ragstar-answer-card h5 {
+  font-size: 1.1rem;
+  color: var(--heading-color);
+  font-weight: 600;
+}
+
+.ragstar-page .ragstar-answer-card p {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 0;
+}
+
 .ragstar-page .ragstar-result-card {
   padding: 0.9rem 1rem;
   border-radius: 0.9rem;
   border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
   background: color-mix(in srgb, var(--surface-color), transparent 20%);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .ragstar-page .ragstar-result-card h5 {
   font-size: 1rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .ragstar-page .ragstar-result-card a {
   font-size: 0.85rem;
   color: color-mix(in srgb, var(--accent-color), transparent 10%);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.ragstar-page .ragstar-result-card p {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.ragstar-page .ragstar-result-card > div:first-child {
+  min-width: 0;
+}
+
+.ragstar-page .ragstar-result-card > div:first-child > div:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .ragstar-page .ragstar-score {
@@ -3051,6 +3099,9 @@ section,
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 0.75rem;
+  align-self: flex-start;
 }
 
 .ragstar-page .ragstar-import .input-group-text {
