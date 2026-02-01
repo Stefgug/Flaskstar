@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flaskstar
+  namespace: ragstar
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: flaskstar-https-ip
+    networking.gke.io/managed-certificates: flaskstar-cert
+    networking.gke.io/v1beta1.FrontendConfig: flaskstar-frontend
+spec:
+  rules:
+    - host: stefgug.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flaskstar
+                port:
+                  number: 80
+    - host: www.stefgug.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flaskstar
+                port:
+                  number: 80

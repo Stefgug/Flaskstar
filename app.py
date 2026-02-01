@@ -1,9 +1,11 @@
 import os
 
 from flask import Flask, render_template, request, jsonify, Response
+from werkzeug.middleware.proxy_fix import ProxyFix
 import requests
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 RAGSTAR_API_URL = os.getenv("RAGSTAR_API_URL", "http://ragstar").rstrip("/")
 
@@ -11,6 +13,13 @@ RAGSTAR_API_URL = os.getenv("RAGSTAR_API_URL", "http://ragstar").rstrip("/")
 @app.get("/health")
 def health():
     return jsonify({"status": "ok"}), 200
+
+
+@app.after_request
+def add_security_headers(response):
+    if request.is_secure or request.headers.get("X-Forwarded-Proto", "") == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    return response
 
 @app.route("/")
 def home():
