@@ -1,0 +1,65 @@
+name: Build and Deploy Flaskstar Image
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: europe-west9
+  REPO: ragstar
+  IMAGE_NAME: flaskstar
+  NAMESPACE: ragstar
+  DEPLOYMENT: flaskstar
+  CONTAINER: flaskstar
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker "${{ env.REGION }}-docker.pkg.dev" --quiet
+
+      - name: Build image
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker build -t "$IMAGE" .
+
+      - name: Push image
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker push "$IMAGE"
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER }}
+          location: ${{ secrets.GKE_CLUSTER_LOCATION }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          use_connect_gateway: true
+
+      - name: Deploy to GKE
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          kubectl apply -f deploy/gke
+          kubectl -n "${{ env.NAMESPACE }}" set image "deployment/${{ env.DEPLOYMENT }}" "${{ env.CONTAINER }}=$IMAGE"
+          kubectl -n "${{ env.NAMESPACE }}" rollout status "deployment/${{ env.DEPLOYMENT }}" --timeout=180s
