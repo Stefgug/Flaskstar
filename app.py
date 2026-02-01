@@ -5,7 +5,12 @@ import requests
 
 app = Flask(__name__)
 
-RAGSTAR_API_URL = os.getenv("RAGSTAR_API_URL", "http://34.155.88.253/")
+RAGSTAR_API_URL = os.getenv("RAGSTAR_API_URL", "http://ragstar").rstrip("/")
+
+
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
 
 @app.route("/")
 def home():

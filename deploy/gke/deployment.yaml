@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskstar
+  namespace: ragstar
+  labels:
+    app: flaskstar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flaskstar
+  template:
+    metadata:
+      labels:
+        app: flaskstar
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: flaskstar
+          image: europe-west9-docker.pkg.dev/ragstar/ragstar/flaskstar:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: RAGSTAR_API_URL
+              value: http://ragstar
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
