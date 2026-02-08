@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | Admin{% endblock %}
+
+{% block body_class %}analytics-page{% endblock %}
+
+{% block content %}
+  <section class="analytics section">
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Private analytics</h2>
+      <p>Usage metrics and recent activity for the portfolio and RAGstar.</p>
+    </div>
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="analytics-panel">
+            <h3>Overview</h3>
+            <ul class="analytics-list">
+              <li>Total page views: <strong>{{ total_views }}</strong></li>
+              <li>Unique visitors (anon): <strong>{{ unique_visitors }}</strong></li>
+            </ul>
+            <h4 class="mt-4">Top pages</h4>
+            <ul class="analytics-list">
+              {% for path, count in top_pages %}
+                <li>{{ path }} <span class="analytics-pill">{{ count }}</span></li>
+              {% else %}
+                <li>No page views yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="analytics-panel">
+            <h3>Recent events</h3>
+            <div class="analytics-table-wrapper">
+              <table class="analytics-table">
+                <thead>
+                  <tr>
+                    <th>Time (UTC)</th>
+                    <th>Event</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in events %}
+                    <tr>
+                      <td>{{ item.timestamp }}</td>
+                      <td>{{ item.event }}</td>
+                      <td class="analytics-details">
+                        {% if item.event == "page_view" %}
+                          {{ item.path }} | {{ item.country or "" }} {{ item.region or "" }} | {{ item.referrer or "Direct" }}
+                        {% elif item.event and item.event.startswith("ragstar_query") %}
+                          {{ item.question }} | tokens: {{ item.tokens.total_tokens if item.tokens else "" }} | {{ item.elapsed_ms or "" }} ms
+                        {% elif item.event and item.event.startswith("ragstar_build_stream") %}
+                          repos: {{ item.repo_count }}{% if item.repositories %} | {{ item.repositories | join(", ") }}{% endif %}
+                        {% elif item.event and item.event.startswith("ragstar_build_starred") %}
+                          {{ item.username }} | repos: {{ item.repo_count }}
+                        {% else %}
+                          {{ item | tojson }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% else %}
+                    <tr>
+                      <td colspan="3">No events logged yet.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

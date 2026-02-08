@@ -51,41 +51,39 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="/" class="active">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="resume.html">Resume</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="portfolio">Portfolio</a></li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="/resume">Resume</a></li>
+          <li><a href="/portfolio">Portfolio</a></li>
+          <li><a href="#" data-contact-toggle aria-controls="contact-popover">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
       <div class="header-social-links">
-        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+        <a href="https://www.linkedin.com/in/stephane-guren" class="linkedin" target="_blank" rel="noopener"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/stefgug" class="github" target="_blank" rel="noopener"><i class="bi bi-github"></i></a>
       </div>
 
     </div>
   </header>
+
+  <div id="contact-popover" class="contact-popover" aria-hidden="true">
+    <button class="contact-popover__close" type="button" aria-label="Close contact details">
+      <i class="bi bi-x"></i>
+    </button>
+    <div class="contact-popover__title">Get in touch</div>
+    <div class="contact-popover__item">
+      <i class="bi bi-envelope"></i>
+      <a href="mailto:stephane.guren@gmail.com">stephane.guren@gmail.com</a>
+    </div>
+    <div class="contact-popover__item">
+      <i class="bi bi-telephone"></i>
+      <a href="tel:+33609280675">+33 6 09 28 06 75</a>
+    </div>
+    <div class="contact-popover__item">
+      <i class="bi bi-linkedin"></i>
+      <a href="https://www.linkedin.com/in/stephane-guren" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
 
   <main class="main">
     {% block content %}{% endblock %}
@@ -98,10 +96,8 @@
         <p>© <span>Copyright</span> <strong class="px-1 sitename">FolioOne</strong> <span>All Rights Reserved<br></span></p>
       </div>
       <div class="social-links d-flex justify-content-center">
-        <a href=""><i class="bi bi-twitter-x"></i></a>
-        <a href=""><i class="bi bi-facebook"></i></a>
-        <a href=""><i class="bi bi-instagram"></i></a>
-        <a href=""><i class="bi bi-linkedin"></i></a>
+        <a href="https://www.linkedin.com/in/stephane-guren" target="_blank" rel="noopener"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/stefgug" target="_blank" rel="noopener"><i class="bi bi-github"></i></a>
       </div>
       <div class="credits">
         <!-- All the links in the footer should remain intact. -->

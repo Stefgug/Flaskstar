@@ -198,7 +198,111 @@
    * Initiate glightbox
    */
   const glightbox = GLightbox({
-    selector: '.glightbox'
+    selector: '.glightbox',
+    touchNavigation: true,
+    zoomable: true,
+    draggable: true
   });
+
+  /**
+   * Contact popover toggle
+   */
+  const contactPopover = document.querySelector('#contact-popover');
+  const contactToggles = document.querySelectorAll('[data-contact-toggle]');
+  const contactClose = contactPopover ? contactPopover.querySelector('.contact-popover__close') : null;
+  let activeContactTrigger = null;
+
+  function positionContactPopover(trigger) {
+    if (!contactPopover || !trigger) {
+      return;
+    }
+    const offset = 12;
+    const rect = trigger.getBoundingClientRect();
+    contactPopover.style.top = `${rect.bottom + window.scrollY + offset}px`;
+    contactPopover.style.left = `${rect.left + window.scrollX}px`;
+
+    const popoverRect = contactPopover.getBoundingClientRect();
+    const minLeft = window.scrollX + 12;
+    const maxLeft = window.scrollX + document.documentElement.clientWidth - popoverRect.width - 12;
+    let nextLeft = rect.left + window.scrollX;
+
+    if (nextLeft < minLeft) {
+      nextLeft = minLeft;
+    }
+    if (nextLeft > maxLeft) {
+      nextLeft = maxLeft;
+    }
+
+    contactPopover.style.left = `${nextLeft}px`;
+  }
+
+  function openContactPopover(trigger) {
+    if (!contactPopover) {
+      return;
+    }
+    activeContactTrigger = trigger;
+    contactPopover.classList.add('is-visible');
+    contactPopover.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => positionContactPopover(trigger));
+  }
+
+  function closeContactPopover() {
+    if (!contactPopover) {
+      return;
+    }
+    contactPopover.classList.remove('is-visible');
+    contactPopover.setAttribute('aria-hidden', 'true');
+    activeContactTrigger = null;
+  }
+
+  if (contactToggles.length > 0 && contactPopover) {
+    contactToggles.forEach((toggle) => {
+      toggle.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (contactPopover.classList.contains('is-visible') && activeContactTrigger === toggle) {
+          closeContactPopover();
+          return;
+        }
+        openContactPopover(toggle);
+      });
+    });
+
+    if (contactClose) {
+      contactClose.addEventListener('click', () => {
+        closeContactPopover();
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (!contactPopover.classList.contains('is-visible')) {
+        return;
+      }
+      if (contactPopover.contains(event.target)) {
+        return;
+      }
+      if (event.target.closest('[data-contact-toggle]')) {
+        return;
+      }
+      closeContactPopover();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeContactPopover();
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      if (contactPopover.classList.contains('is-visible')) {
+        positionContactPopover(activeContactTrigger);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (contactPopover.classList.contains('is-visible')) {
+        positionContactPopover(activeContactTrigger);
+      }
+    });
+  }
 
 })();

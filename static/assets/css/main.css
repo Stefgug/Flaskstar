@@ -704,14 +704,18 @@ section,
 # Hero Section
 --------------------------------------------------------------*/
 .hero {
-  padding: 80px 0;
-  min-height: 100vh;
+  padding: 10px 0 12px;
+  min-height: auto;
   display: flex;
   align-items: center;
 }
 
+.hero > .container {
+  margin-top: 0;
+}
+
 .hero .hero-content h1 {
-  font-size: 3.5rem;
+  font-size: 4.4rem;
   font-weight: 700;
   margin-bottom: 1rem;
   line-height: 1.2;
@@ -735,12 +739,12 @@ section,
 
 @media (max-width: 768px) {
   .hero .hero-content h1 {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
   }
 }
 
 .hero .hero-content h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 400;
   margin-bottom: 2rem;
   color: color-mix(in srgb, var(--default-color), transparent 20%);
@@ -753,12 +757,12 @@ section,
 
 @media (max-width: 768px) {
   .hero .hero-content h2 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 }
 
 .hero .hero-content p {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   line-height: 1.6;
   margin-bottom: 2.5rem;
   color: color-mix(in srgb, var(--default-color), transparent 30%);
@@ -836,6 +840,75 @@ section,
   box-shadow: 0 8px 25px color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
+.contact-popover {
+  position: absolute;
+  z-index: 1000;
+  width: min(320px, 90vw);
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--surface-color);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 85%);
+  box-shadow: 0 18px 40px color-mix(in srgb, #000000, transparent 60%);
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.contact-popover.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.contact-popover__title {
+  font-weight: 600;
+  color: var(--heading-color);
+  margin-bottom: 12px;
+}
+
+.contact-popover__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: var(--default-color);
+}
+
+.contact-popover__item:last-child {
+  margin-bottom: 0;
+}
+
+.contact-popover__item i {
+  color: var(--accent-color);
+  font-size: 1.1rem;
+}
+
+.contact-popover__item a {
+  color: var(--default-color);
+}
+
+.contact-popover__item a:hover {
+  color: var(--accent-color);
+}
+
+.contact-popover__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  font-size: 1.2rem;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.contact-popover__close:hover {
+  color: var(--default-color);
+}
+
 .hero .hero-image {
   position: relative;
   overflow: visible;
@@ -843,7 +916,7 @@ section,
 
 .hero .hero-image .image-wrapper {
   position: relative;
-  max-width: 450px;
+  max-width: 600px;
   margin: 0 auto;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -894,20 +967,20 @@ section,
 }
 
 .hero .hero-image .floating-elements .floating-card.design {
-  top: 10%;
-  right: -4%;
+  top: 6%;
+  right: 6%;
   animation-delay: 0s;
 }
 
 .hero .hero-image .floating-elements .floating-card.code {
-  bottom: 30%;
-  left: -7%;
+  bottom: 26%;
+  left: 6%;
   animation-delay: 1s;
 }
 
 .hero .hero-image .floating-elements .floating-card.creativity {
-  top: 60%;
-  right: -2%;
+  top: 62%;
+  right: 8%;
   animation-delay: 2s;
 }
 
@@ -2970,6 +3043,12 @@ section,
   gap: 0.35rem;
 }
 
+.ragstar-page .ragstar-link--hero {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 0.65rem;
+}
+
 .ragstar-page .ragstar-list ul {
   padding-left: 1.2rem;
   margin: 0;
@@ -3146,8 +3225,132 @@ section,
   color: color-mix(in srgb, var(--default-color), transparent 45%);
 }
 
+.ragstar-page .ragstar-figure {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--background-color), transparent 8%);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+}
+
+.ragstar-page .ragstar-figure-title {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--default-color), transparent 40%);
+}
+
+.ragstar-page .ragstar-figure-link {
+  position: relative;
+  display: block;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 85%);
+  cursor: zoom-in;
+}
+
+.ragstar-page .ragstar-figure-link img {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.ragstar-page .ragstar-figure-cta {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--contrast-color);
+  background: color-mix(in srgb, var(--accent-color), transparent 15%);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.ragstar-page .ragstar-figure-link:hover img {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+}
+
 @media (max-width: 991.98px) {
   .ragstar-page .ragstar-panel {
     padding: 1.5rem;
   }
+}
+
+/*--------------------------------------------------------------
+# Analytics Admin Page
+--------------------------------------------------------------*/
+.analytics-page .analytics-panel {
+  background-color: var(--surface-color);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+.analytics-page .analytics-panel h3 {
+  font-size: 1.45rem;
+  margin-bottom: 1rem;
+}
+
+.analytics-page .analytics-panel h4 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--default-color), transparent 35%);
+}
+
+.analytics-page .analytics-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.analytics-page .analytics-pill {
+  background: color-mix(in srgb, var(--accent-color), transparent 15%);
+  color: var(--contrast-color);
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  margin-left: 0.35rem;
+}
+
+.analytics-page .analytics-table-wrapper {
+  overflow-x: auto;
+}
+
+.analytics-page .analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.analytics-page .analytics-table th,
+.analytics-page .analytics-table td {
+  border-bottom: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  padding: 0.75rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.analytics-page .analytics-table th {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--default-color), transparent 35%);
+}
+
+.analytics-page .analytics-details {
+  color: color-mix(in srgb, var(--default-color), transparent 15%);
+  max-width: 460px;
 }

@@ -79,3 +79,5 @@ build/
 
 .env
 .envrc
+CV/
+*.png
