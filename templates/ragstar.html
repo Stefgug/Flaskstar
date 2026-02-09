@@ -120,7 +120,7 @@
                 <ul>
                   <li>Fetches README.md content with github API</li>
                   <li>Summarizes repositories using Mistral Ollama model hosted locally.</li>
-                  <li>Indexes summaries in ChromaDB with mxbai-embed-large embeddings.</li>
+                  <li>Indexes summaries in ChromaDB with nomic-embed-text embeddings.</li>
                   <li>Answers queries with hybrid dense + BM25 scoring.</li>
                 </ul>
               </div>
@@ -236,7 +236,7 @@
         statusEl.dataset.state = type;
       };
 
-      const renderResults = (answer = "", sources = []) => {
+      const renderResults = (answer = "", sources = [], backend = null) => {
         countEl.textContent = String(sources.length);
 
         let html = "";
@@ -249,6 +249,24 @@
               <p class="mb-0">${answer}</p>
             </div>
           `;
+        }
+
+        // Display backend fallback notice if not fully on Ollama
+        if (backend) {
+          const parts = [];
+          if (backend.embedding && backend.embedding !== "ollama") {
+            parts.push(`search via ${backend.embedding === "fireworks" ? "Fireworks AI" : backend.embedding}`);
+          }
+          if (backend.generation && backend.generation !== "ollama") {
+            parts.push(`generation via ${backend.generation === "openai" ? "OpenAI" : backend.generation}`);
+          }
+          if (parts.length > 0) {
+            html += `
+              <div class="ragstar-backend-notice">
+                <small>Ollama unavailable &mdash; using ${parts.join(", ")}</small>
+              </div>
+            `;
+          }
         }
 
         // Then display the source repositories
@@ -303,7 +321,7 @@
             throw new Error(data.error || "RAGstar query failed.");
           }
 
-          renderResults(data.answer || "", data.sources || []);
+          renderResults(data.answer || "", data.sources || [], data.backend || null);
           setStatus("Results updated.", "success");
 
           // Update token metrics

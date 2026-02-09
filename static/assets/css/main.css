@@ -3131,6 +3131,15 @@ section,
   margin-bottom: 0;
 }
 
+.ragstar-page .ragstar-backend-notice {
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.6rem;
+  border: 1px solid color-mix(in srgb, #e6a817, transparent 60%);
+  background: color-mix(in srgb, #e6a817, transparent 92%);
+  margin-bottom: 0.5rem;
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+}
+
 .ragstar-page .ragstar-result-card {
   padding: 0.9rem 1rem;
   border-radius: 0.9rem;
