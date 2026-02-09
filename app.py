@@ -24,7 +24,7 @@ ANALYTICS_GEO = os.getenv("ANALYTICS_GEO", "1") == "1"
 ANALYTICS_MAX_EVENTS = int(os.getenv("ANALYTICS_MAX_EVENTS", "200"))
 ALLOWED_ADMIN_IPS = {
     ip.strip()
-    for ip in os.getenv("ANALYTICS_ALLOWED_IPS", "90.92.127.233").split(",")
+    for ip in os.getenv("ANALYTICS_ALLOWED_IPS", "90.92.127.233,127.0.0.1,::1").split(",")
     if ip.strip()
 }
 _analytics_lock = threading.Lock()
@@ -234,6 +234,14 @@ def analytics_dashboard():
 
     top_pages = sorted(page_counts.items(), key=lambda kv: kv[1], reverse=True)[:10]
 
+    country_counts = {}
+    for item in page_views:
+        country = item.get("country") or "Unknown"
+        country_counts[country] = country_counts.get(country, 0) + 1
+
+    top_countries = sorted(country_counts.items(), key=lambda kv: kv[1], reverse=True)[:8]
+    endpoint_options = sorted(page_counts.keys())
+
     rag_events = [item for item in events if item.get("event", "").startswith("ragstar_")]
     return render_template(
         "admin_analytics.html",
@@ -241,6 +249,8 @@ def analytics_dashboard():
         total_views=len(page_views),
         unique_visitors=unique_visitors,
         top_pages=top_pages,
+        top_countries=top_countries,
+        endpoint_options=endpoint_options,
         rag_events=list(reversed(rag_events)),
     )
 

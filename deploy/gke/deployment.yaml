@@ -27,6 +27,11 @@ spec:
           env:
             - name: RAGSTAR_API_URL
               value: http://ragstar
+            - name: ANALYTICS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: flaskstar-analytics
+                  key: analytics-pass
           readinessProbe:
             httpGet:
               path: /health

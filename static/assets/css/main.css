@@ -3354,3 +3354,50 @@ section,
   color: color-mix(in srgb, var(--default-color), transparent 15%);
   max-width: 460px;
 }
+
+.analytics-page .analytics-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.analytics-page .analytics-meta {
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--default-color), transparent 35%);
+}
+
+.analytics-page .analytics-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.analytics-page .analytics-input,
+.analytics-page .analytics-select {
+  background: color-mix(in srgb, var(--surface-color), transparent 25%);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+  color: var(--default-color);
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.analytics-page .analytics-input:focus,
+.analytics-page .analytics-select:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent-color), transparent 35%);
+  border-color: color-mix(in srgb, var(--accent-color), transparent 20%);
+}
+
+.analytics-page .analytics-details__text {
+  display: block;
+  word-break: break-word;
+}
+
+@media (max-width: 991px) {
+  .analytics-page .analytics-controls {
+    grid-template-columns: 1fr;
+  }
+}

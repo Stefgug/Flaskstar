@@ -28,12 +28,40 @@
                 <li>No page views yet.</li>
               {% endfor %}
             </ul>
+            <h4 class="mt-4">Top countries</h4>
+            <ul class="analytics-list">
+              {% for country, count in top_countries %}
+                <li>{{ country }} <span class="analytics-pill">{{ count }}</span></li>
+              {% else %}
+                <li>No geo data yet.</li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
 
         <div class="col-lg-8">
           <div class="analytics-panel">
-            <h3>Recent events</h3>
+            <div class="analytics-heading">
+              <h3>Recent events</h3>
+              <div class="analytics-meta">
+                <span id="analytics-count">Showing 0 of 0</span>
+              </div>
+            </div>
+            <div class="analytics-controls">
+              <input
+                type="search"
+                class="analytics-input"
+                id="analytics-search"
+                placeholder="Search events, countries, referrers..."
+                aria-label="Search analytics events"
+              />
+              <select class="analytics-select" id="analytics-endpoint" aria-label="Filter by endpoint">
+                <option value="">All endpoints</option>
+                {% for path in endpoint_options %}
+                  <option value="{{ path }}">{{ path }}</option>
+                {% endfor %}
+              </select>
+            </div>
             <div class="analytics-table-wrapper">
               <table class="analytics-table">
                 <thead>
@@ -45,21 +73,31 @@
                 </thead>
                 <tbody>
                   {% for item in events %}
+                    {% set details_text = "" %}
+                    {% if item.event == "page_view" %}
+                      {% set details_text = (item.path ~ " | " ~ (item.country or "") ~ " " ~ (item.region or "") ~ " | " ~ (item.referrer or "Direct")) %}
+                    {% elif item.event and item.event.startswith("ragstar_query") %}
+                      {% set details_text = (item.question ~ " | tokens: " ~ (item.tokens.total_tokens if item.tokens else "") ~ " | " ~ (item.elapsed_ms or "") ~ " ms") %}
+                    {% elif item.event and item.event.startswith("ragstar_build_stream") %}
+                      {% set details_text = ("repos: " ~ (item.repo_count or "") ~ (" | " ~ (item.repositories | join(", ")) if item.repositories else "")) %}
+                    {% elif item.event and item.event.startswith("ragstar_build_starred") %}
+                      {% set details_text = (item.username ~ " | repos: " ~ (item.repo_count or "")) %}
+                    {% else %}
+                      {% set details_text = item | tojson %}
+                    {% endif %}
                     <tr>
                       <td>{{ item.timestamp }}</td>
                       <td>{{ item.event }}</td>
                       <td class="analytics-details">
-                        {% if item.event == "page_view" %}
-                          {{ item.path }} | {{ item.country or "" }} {{ item.region or "" }} | {{ item.referrer or "Direct" }}
-                        {% elif item.event and item.event.startswith("ragstar_query") %}
-                          {{ item.question }} | tokens: {{ item.tokens.total_tokens if item.tokens else "" }} | {{ item.elapsed_ms or "" }} ms
-                        {% elif item.event and item.event.startswith("ragstar_build_stream") %}
-                          repos: {{ item.repo_count }}{% if item.repositories %} | {{ item.repositories | join(", ") }}{% endif %}
-                        {% elif item.event and item.event.startswith("ragstar_build_starred") %}
-                          {{ item.username }} | repos: {{ item.repo_count }}
-                        {% else %}
-                          {{ item | tojson }}
-                        {% endif %}
+                        <div
+                          class="analytics-details__text"
+                          data-event="{{ item.event or '' }}"
+                          data-path="{{ item.path or '' }}"
+                          data-country="{{ item.country or '' }}"
+                          data-search="{{ (item.event or '') ~ ' ' ~ (item.path or '') ~ ' ' ~ (item.country or '') ~ ' ' ~ details_text }}"
+                        >
+                          {{ details_text }}
+                        </div>
                       </td>
                     </tr>
                   {% else %}
@@ -75,4 +113,54 @@
       </div>
     </div>
   </section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("analytics-search");
+      const endpointSelect = document.getElementById("analytics-endpoint");
+      const countLabel = document.getElementById("analytics-count");
+      const detailNodes = Array.from(document.querySelectorAll(".analytics-details__text"));
+
+      if (!searchInput || !endpointSelect || !countLabel || detailNodes.length === 0) {
+        return;
+      }
+
+      const rows = detailNodes.map((node) => node.closest("tr")).filter(Boolean);
+
+      const normalize = (value) => (value || "").toLowerCase().trim();
+
+      function applyFilters() {
+        const term = normalize(searchInput.value);
+        const endpoint = endpointSelect.value;
+        let visible = 0;
+
+        detailNodes.forEach((node, index) => {
+          const row = rows[index];
+          const searchText = normalize(node.dataset.search || node.textContent);
+          const path = node.dataset.path || "";
+
+          const matchesTerm = !term || searchText.includes(term);
+          const matchesEndpoint = !endpoint || path === endpoint;
+          const showRow = matchesTerm && matchesEndpoint;
+
+          if (row) {
+            row.style.display = showRow ? "" : "none";
+          }
+
+          if (showRow) {
+            visible += 1;
+          }
+        });
+
+        countLabel.textContent = `Showing ${visible} of ${detailNodes.length}`;
+      }
+
+      searchInput.addEventListener("input", applyFilters);
+      endpointSelect.addEventListener("change", applyFilters);
+
+      applyFilters();
+    });
+  </script>
 {% endblock %}
