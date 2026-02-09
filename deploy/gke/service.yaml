@@ -5,6 +5,8 @@ metadata:
   namespace: ragstar
   labels:
     app: flaskstar
+  annotations:
+    cloud.google.com/backend-config: '{"default": "flaskstar-backend"}'
 spec:
   selector:
     app: flaskstar
